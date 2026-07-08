@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Village Information Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            color: #1a2a2a;
+        }
+        .header {
+            background: #0b3b2c;
+            color: white;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .logo i {
+            color: #8fde9b;
+        }
+        nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        nav a:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .admin-link {
+            background: #d4a373;
+            color: #0b3b2c !important;
+        }
+        .admin-link:hover {
+            background: #e8c9a0 !important;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0b3b2c, #1a5a44);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            margin: 2.5rem 0 1.5rem;
+            color: #0b3b2c;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .section-title i {
+            font-size: 1.8rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .card h3 {
+            color: #0b3b2c;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            color: #475569;
+            line-height: 1.6;
+        }
+        .card .meta {
+            margin-top: 0.8rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .card .meta i {
+            margin-right: 0.3rem;
+        }
+        .emergency {
+            border-left: 4px solid #dc2626;
+            background: #fef2f2;
+        }
+        .emergency-badge {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .important {
+            border-left: 4px solid #f59e0b;
+        }
+        .important-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .status {
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-in-progress { background: #dbeafe; color: #1e40af; }
+        .status-resolved { background: #d1fae5; color: #065f46; }
+        
+        /* Complaint Form */
+        .complaint-form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin: 2rem 0;
+        }
+        .complaint-form-section h2 {
+            color: #0b3b2c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .complaint-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+        .complaint-form .full-width {
+            grid-column: 1 / -1;
+        }
+        .complaint-form label {
+            font-weight: 600;
+            color: #0b3b2c;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .complaint-form input,
+        .complaint-form textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .complaint-form input:focus,
+        .complaint-form textarea:focus {
+            outline: none;
+            border-color: #0b3b2c;
+            box-shadow: 0 0 0 4px rgba(11, 59, 44, 0.1);
+        }
+        .complaint-form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .submit-complaint-btn {
+            padding: 0.8rem 2rem;
+            background: #0b3b2c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .submit-complaint-btn:hover {
+            background: #1a5a44;
+            transform: translateY(-2px);
+        }
+        .submit-complaint-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #0b3b2c;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.error {
+            background: #dc2626;
+        }
+        .toast i {
+            margin-right: 0.5rem;
+        }
+        
+        .footer {
+            background: #06261c;
+            color: rgba(255,255,255,0.7);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .complaint-form {
+                grid-template-columns: 1fr;
+            }
+            .complaint-form .full-width {
+                grid-column: 1;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            nav {
+                justify-content: center;
+            }
+        }
+        .event-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .event-gallery .thumb-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #e2e8ed;
+        }
+        .event-gallery .thumb {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0;
+            display: block;
+            cursor: pointer;
+            background: none;
+        }
+        .event-gallery .thumb img,
+        .event-gallery .thumb video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .event-gallery .thumb.doc {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            font-size: 0.65rem;
+            color: #0b3b2c;
+            text-decoration: none;
+            padding: 0.25rem;
+            text-align: center;
+            word-break: break-word;
+        }
+        .event-gallery .thumb.doc i {
+            font-size: 1.4rem;
+        }
+        .event-gallery .play-badge {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            background: rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+        .event-gallery .dl-btn {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(11,59,44,0.85);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            text-decoration: none;
+            z-index: 2;
+        }
+        .event-gallery .dl-btn:hover {
+            background: #0b3b2c;
+        }
+        .event-media-empty {
+            font-size: 0.85rem;
+            color: #667;
+            margin-top: 0.5rem;
+        }
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .lightbox-overlay.active {
+            display: flex;
+        }
+        .lightbox-overlay img,
+        .lightbox-overlay video {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            display: block;
+        }
+        .lightbox-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .lightbox-download {
+            background: #0b3b2c;
+            color: #fff;
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .lightbox-download:hover {
+            background: #145c44;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo"><i class="fas fa-tree"></i>S R Kandigai Official</div>
+            <nav>
+                <a href="#services">Services</a>
+                <a href="#events">Events</a>
+                <a href="#announcements">Announcements</a>
+                <a href="#complaints">Complaints</a>
+                <a href="#register-complaint">Register Complaint</a>
+                <a href="/admin/login" class="admin-link"><i class="fas fa-user-shield"></i> Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>Welcome to Our Village</h1>
+        <p>Your one-stop portal for all village information, services, and updates.</p>
+        <p>One Community,One Family🫂</p>
+    </div>
+
+    <div class="container">
+        <!-- Services -->
+        <h2 id="services" class="section-title"><i class="fas fa-phone"></i> Services</h2>
+        <div class="grid">
+            {% for service in services %}
+            <div class="card {% if service.is_emergency %}emergency{% endif %}">
+                {% if service.is_emergency %}
+                <span class="emergency-badge">🚨 Emergency</span>
+                {% endif %}
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+                {% if service.contact %}
+                <div class="meta">
+                    <i class="fas fa-phone"></i> {{ service.contact }}
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="card"><p>No services available.</p></div>
+            {% endfor %}
+        </div>
+
+        <!-- Events -->
+        <h2 id="events" class="section-title"><i class="fas fa-calendar"></i> Events</h2>
+        <div class="grid">
+            {% for event in events %}
+            <div class="card">
+                <h3>{{ event.title }}</h3>
+                <p>{{ event.description }}</p>
+                <div class="meta">
+                    <i class="fas fa-calendar-alt"></i> {{ event.date }}
+                    {% if event.location %}
+                    <span style="margin-left: 1rem;"><i class="fas fa-map-marker-alt"></i> {{ event.location }}</span>
+                    {% endif %}
+                </div>
+                {% if event.media and event.media|length > 0 %}
+                <div class="event-gallery">
+                    {% for m in event.media %}
+                    {% set clean_path = m.file_path %}
+                    <div class="thumb-wrap">
+                        {% if m.media_type == 'photo' %}
+                        <button type="button" class="thumb" onclick="openLightbox('image', '{{ clean_path }}', '/media/{{ m.id }}/download', '{{ m.original_filename }}')">
+                            <img src="{{ clean_path }}" alt="{{ m.original_filename }}" loading="lazy">
+                        </button>
+                        {% elif m.media_type == 'video' %}
+                        <button type="button" class="thumb" onclick="openLightbox('video', '{{ clean_path }}', '/media/{{ m.id }}/download', '{{ m.original_filename }}')">
+                            <video src="{{ clean_path }}" muted></video>
+                            <span class="play-badge"><i class="fas fa-play-circle"></i></span>
+                        </button>
+                        {% else %}
+                        <a class="thumb doc" href="{{ clean_path }}" target="_blank" rel="noopener" title="{{ m.original_filename }}">
+                            <i class="fas fa-file-alt"></i>
+                            <span>{{ m.original_filename[:14] }}{% if m.original_filename|length > 14 %}…{% endif %}</span>
+                        </a>
+                        {% endif %}
+                        <a class="dl-btn" href="/media/{{ m.id }}/download" title="Download {{ m.original_filename }}">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="event-media-empty"><i class="fas fa-image"></i> No photos, videos, or documents yet.</p>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="card"><p>No events scheduled.</p></div>
+            {% endfor %}
+        </div>
+
+        <!-- Announcements -->
+        <h2 id="announcements" class="section-title"><i class="fas fa-bullhorn"></i> Announcements</h2>
+        <div class="grid">
+            {% for announcement in announcements %}
+            <div class="card {% if announcement.is_important %}important{% endif %}">
+                {% if announcement.is_important %}
+                <span class="important-badge">⭐ Important</span>
+                {% endif %}
+                <h3>{{ announcement.title }}</h3>
+                <p>{{ announcement.content }}</p>
+                <div class="meta">
+                    <i class="fas fa-clock"></i> {{ announcement.date }}
+                </div>
+            </div>
+            {% else %}
+            <div class="card"><p>No announcements.</p></div>
+            {% endfor %}
+        </div>
+
+        <!-- Complaints List -->
+        <h2 id="complaints" class="section-title"><i class="fas fa-clipboard-list"></i> Complaints</h2>
+        <div class="grid">
+            {% for complaint in complaints %}
+            <div class="card">
+                <h3>{{ complaint.title }}</h3>
+                <p>{{ complaint.description }}</p>
+                <div class="meta">
+                    <span><i class="fas fa-calendar-alt"></i> {{ complaint.date }}</span>
+                    <span style="margin-left: 1rem;">
+                        <span class="status status-{{ complaint.status.lower().replace(' ', '-') }}">
+                            {{ complaint.status }}
+                        </span>
+                    </span>
+                    {% if complaint.location %}
+                    <span style="margin-left: 1rem;"><i class="fas fa-map-marker-alt"></i> {{ complaint.location }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="card"><p>No complaints registered.</p></div>
+            {% endfor %}
+        </div>
+
+        <!-- Register Complaint Form -->
+        <div id="register-complaint" class="complaint-form-section">
+            <h2><i class="fas fa-pen"></i> Register a Complaint</h2>
+            <p style="color: #64748b; margin-bottom: 1.5rem;">Submit your complaint and our team will look into it promptly.</p>
+            
+            <form class="complaint-form" id="complaintForm">
+                <div class="full-width">
+                    <label for="complaintTitle">Title *</label>
+                    <input type="text" id="complaintTitle" placeholder="Brief title of your complaint" required>
+                </div>
+                <div class="full-width">
+                    <label for="complaintDesc">Description *</label>
+                    <textarea id="complaintDesc" placeholder="Describe your complaint in detail" required></textarea>
+                </div>
+                <div>
+                    <label for="complaintLocation">Location</label>
+                    <input type="text" id="complaintLocation" placeholder="Where did this happen?">
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <button type="submit" class="submit-complaint-btn" id="submitComplaintBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Complaint
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>A small place making a big difference— Built with ❤️ for the community</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- Lightbox for viewing event photos/videos full-size -->
+    <div id="lightboxOverlay" class="lightbox-overlay" onclick="closeLightbox(event)">
+        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+        <div id="lightboxContent"></div>
+    </div>
+
+    <script>
+        // ===== COMPLAINT FORM HANDLING =====
+        document.getElementById('complaintForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var title = document.getElementById('complaintTitle').value.trim();
+            var description = document.getElementById('complaintDesc').value.trim();
+            var location = document.getElementById('complaintLocation').value.trim();
+            
+            if (!title || !description) {
+                showToast('Please fill in both title and description', true);
+                return;
+            }
+            
+            var submitBtn = document.getElementById('submitComplaintBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            
+            var data = {
+                title: title,
+                description: description,
+                location: location || ''
+            };
+            
+            fetch('/api/public/complaints', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                    document.getElementById('complaintForm').reset();
+                    // Reload complaints after a delay
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showToast('❌ Error: ' + data.message, true);
+                }
+            })
+            .catch(function(error) {
+                showToast('❌ Error submitting complaint. Please try again.', true);
+                console.error('Error:', error);
+            })
+            .finally(function() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Complaint';
+            });
+        });
+
+        // ===== TOAST NOTIFICATION =====
+        function showToast(message, isError) {
+            var toast = document.getElementById('toast');
+            var toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            
+            toast.classList.remove('error');
+            if (isError) {
+                toast.classList.add('error');
+                toast.querySelector('i').className = 'fas fa-exclamation-circle';
+            } else {
+                toast.querySelector('i').className = 'fas fa-check-circle';
+            }
+            
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ===== SMOOTH SCROLLING =====
+        document.querySelectorAll('nav a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ===== EVENT MEDIA LIGHTBOX =====
+        function openLightbox(type, url, downloadUrl, filename) {
+            var content = document.getElementById('lightboxContent');
+            var media = type === 'video'
+                ? '<video src="' + url + '" controls autoplay></video>'
+                : '<img src="' + url + '" alt="Event photo">';
+            content.innerHTML =
+                '<div class="lightbox-inner">' +
+                    media +
+                    '<a class="lightbox-download" href="' + downloadUrl + '" title="Download ' + filename + '">' +
+                        '<i class="fas fa-download"></i> Download' +
+                    '</a>' +
+                '</div>';
+            document.getElementById('lightboxOverlay').classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            if (e.target.id === 'lightboxOverlay' || e.target.classList.contains('lightbox-close')) {
+                document.getElementById('lightboxContent').innerHTML = '';
+                document.getElementById('lightboxOverlay').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Village Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-tree"></i>
+                <h2>Village Portal Admin</h2>
+                <p>Login to manage your village information</p>
+            </div>
+
+            {% if error %}
+                <div class="alert alert-error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" action="/admin/login">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input type="text" id="username" name="username" required placeholder="Enter admin username">
+                </div>
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <a href="/" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Home
+                </a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

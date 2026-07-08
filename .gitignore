@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+.env
+*.db
+.DS_Store
+.vercel
+
+# Event photos/videos/documents are stored in Cloudinary (cloud), not on local disk.

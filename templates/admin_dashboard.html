@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+        }
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #0b3b2c;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.2rem;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .sidebar a.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            flex: 1;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #0b3b2c;
+        }
+        .stat-card i {
+            font-size: 2rem;
+            color: #0b3b2c;
+        }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: #f8fafc;
+            text-align: left;
+            padding: 0.8rem 1rem;
+            color: #0b3b2c;
+        }
+        td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .add-btn {
+            margin-bottom: 1rem;
+            padding: 0.6rem 1.2rem;
+            background: #0b3b2c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .add-btn:hover {
+            background: #1a5a44;
+        }
+        .edit-btn, .delete-btn {
+            padding: 0.3rem 0.6rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .delete-btn {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .logout-link {
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1rem;
+        }
+        .status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-in-progress { background: #dbeafe; color: #1e40af; }
+        .status-resolved { background: #d1fae5; color: #065f46; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .close:hover {
+            color: #0b3b2c;
+        }
+        .modal input, .modal textarea, .modal select {
+            width: 100%;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus {
+            outline: none;
+            border-color: #0b3b2c;
+        }
+        .modal .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0b3b2c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .modal .submit-btn:hover {
+            background: #1a5a44;
+        }
+        .modal label {
+            font-weight: 600;
+            color: #0b3b2c;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .section-content {
+            display: none;
+        }
+        .section-content.active {
+            display: block;
+        }
+        #dashboard.section-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-tree"></i>
+                <span>VillageAdmin</span>
+            </div>
+            <a href="#dashboard" class="active" onclick="showSection('dashboard')">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="#services" onclick="showSection('services')">
+                <i class="fas fa-phone"></i> Services
+            </a>
+            <a href="#events" onclick="showSection('events')">
+                <i class="fas fa-calendar"></i> Events
+            </a>
+            <a href="#announcements" onclick="showSection('announcements')">
+                <i class="fas fa-bullhorn"></i> Announcements
+            </a>
+            <a href="#complaints" onclick="showSection('complaints')">
+                <i class="fas fa-clipboard"></i> Complaints
+            </a>
+            <a href="/admin/logout" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </aside>
+
+        <main class="main-content">
+            <div class="admin-header">
+                <h1>Admin Dashboard</h1>
+                <span><i class="fas fa-user"></i> {{ current_user.username }}</span>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="dashboard" class="section-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-phone"></i>
+                        <h3>{{ stats.services }}</h3>
+                        <p>Services</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar"></i>
+                        <h3>{{ stats.events }}</h3>
+                        <p>Events</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-bullhorn"></i>
+                        <h3>{{ stats.announcements }}</h3>
+                        <p>Announcements</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clipboard"></i>
+                        <h3>{{ stats.complaints }}</h3>
+                        <p>Complaints</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services -->
+            <div id="services" class="section-content">
+                <h2>Manage Services</h2>
+                <button class="add-btn" onclick="showAddForm('service')">
+                    <i class="fas fa-plus"></i> Add Service
+                </button>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Contact</th>
+                                <th>Emergency</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for service in services %}
+                            <tr>
+                                <td>{{ service.title }}</td>
+                                <td>{{ service.description[:50] }}...</td>
+                                <td>{{ service.contact or 'N/A' }}</td>
+                                <td>{{ 'Yes' if service.is_emergency else 'No' }}</td>
+                                <td>
+                                    <button class="edit-btn" onclick="editItem('service', {{ service.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteItem('service', {{ service.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Events -->
+            <div id="events" class="section-content">
+                <h2>Manage Events</h2>
+                <button class="add-btn" onclick="showAddForm('event')">
+                    <i class="fas fa-plus"></i> Add Event
+                </button>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td>{{ event.title }}</td>
+                                <td>{{ event.description[:50] }}...</td>
+                                <td>{{ event.date }}</td>
+                                <td>{{ event.location or 'N/A' }}</td>
+                                <td>
+                                    <button class="edit-btn" onclick="editItem('event', {{ event.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="edit-btn" data-event-id="{{ event.id }}" data-event-title="{{ event.title }}" onclick="openMediaModal(this.dataset.eventId, this.dataset.eventTitle)" title="Manage photos, videos & documents">
+                                        <i class="fas fa-photo-video"></i> Media ({{ event.media|length }})
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteItem('event', {{ event.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Announcements -->
+            <div id="announcements" class="section-content">
+                <h2>Manage Announcements</h2>
+                <button class="add-btn" onclick="showAddForm('announcement')">
+                    <i class="fas fa-plus"></i> Add Announcement
+                </button>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Content</th>
+                                <th>Date</th>
+                                <th>Important</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for announcement in announcements %}
+                            <tr>
+                                <td>{{ announcement.title }}</td>
+                                <td>{{ announcement.content[:50] }}...</td>
+                                <td>{{ announcement.date }}</td>
+                                <td>{{ 'Yes' if announcement.is_important else 'No' }}</td>
+                                <td>
+                                    <button class="edit-btn" onclick="editItem('announcement', {{ announcement.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteItem('announcement', {{ announcement.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Complaints -->
+            <div id="complaints" class="section-content">
+                <h2>Manage Complaints</h2>
+                <button class="add-btn" onclick="showAddForm('complaint')">
+                    <i class="fas fa-plus"></i> Add Complaint
+                </button>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in complaints %}
+                            <tr>
+                                <td>{{ complaint.title }}</td>
+                                <td>{{ complaint.description[:50] }}...</td>
+                                <td>{{ complaint.location or 'N/A' }}</td>
+                                <td>
+                                    {% set status_class = complaint.status.lower().replace(' ', '-') %}
+                                    <span class="status status-{{ status_class }}">
+                                        {{ complaint.status }}
+                                    </span>
+                                </td>
+                                <td>{{ complaint.date }}</td>
+                                <td>
+                                    <button class="edit-btn" onclick="editItem('complaint', {{ complaint.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteItem('complaint', {{ complaint.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Add Item</h2>
+            <form id="modalForm" onsubmit="submitForm(event)">
+                <input type="hidden" id="itemId">
+                <input type="hidden" id="itemType">
+                <div>
+                    <label>Title</label>
+                    <input type="text" id="formTitle" required>
+                </div>
+                <div>
+                    <label>Description</label>
+                    <textarea id="formDescription" rows="3" required></textarea>
+                </div>
+                <div id="extraFields"></div>
+                <button type="submit" class="submit-btn">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Media Modal: upload/view/delete photos, videos & documents for one event -->
+    <div id="mediaModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeMediaModal()">&times;</span>
+            <h2 id="mediaModalTitle">Event Media</h2>
+            <p style="color:#667; font-size:0.85rem; margin-bottom:0.75rem;">
+                Upload any number of photos, videos, or documents. They're stored on the
+                server for free and stay available to the public indefinitely.
+            </p>
+            <div style="margin-bottom:1rem;">
+                <input type="file" id="mediaFileInput" multiple
+                       accept=".jpg,.jpeg,.png,.gif,.webp,.bmp,.heic,.mp4,.mov,.avi,.mkv,.webm,.m4v,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv">
+                <button type="button" class="submit-btn" style="margin-top:0.5rem;" onclick="uploadEventMedia()">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+                <span id="mediaUploadStatus" style="margin-left:0.5rem; font-size:0.85rem;"></span>
+            </div>
+            <div id="mediaList" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:0.75rem;">
+                <!-- populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show section
+        function showSection(sectionId) {
+            var sections = document.querySelectorAll('.section-content');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].classList.remove('active');
+            }
+            document.getElementById(sectionId).classList.add('active');
+            
+            var links = document.querySelectorAll('.sidebar a');
+            for (var j = 0; j < links.length; j++) {
+                links[j].classList.remove('active');
+            }
+            var activeLink = document.querySelector('.sidebar a[href="#' + sectionId + '"]');
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+
+        // Show add form
+        function showAddForm(type) {
+            var title = 'Add ' + type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('itemType').value = type;
+            document.getElementById('itemId').value = '';
+            document.getElementById('formTitle').value = '';
+            document.getElementById('formDescription').value = '';
+            document.getElementById('extraFields').innerHTML = '';
+            
+            if (type === 'event') {
+                document.getElementById('extraFields').innerHTML = 
+                    '<div><label>Date</label><input type="date" id="formDate" required></div>' +
+                    '<div><label>Location</label><input type="text" id="formLocation"></div>';
+            } else if (type === 'service') {
+                document.getElementById('extraFields').innerHTML = 
+                    '<div><label>Contact</label><input type="text" id="formContact"></div>' +
+                    '<div><label><input type="checkbox" id="formEmergency"> Emergency</label></div>';
+            } else if (type === 'announcement') {
+                document.getElementById('extraFields').innerHTML = 
+                    '<div><label>Date</label><input type="date" id="formDate" required></div>' +
+                    '<div><label><input type="checkbox" id="formImportant"> Important</label></div>';
+            } else if (type === 'complaint') {
+                document.getElementById('extraFields').innerHTML = 
+                    '<div><label>Location</label><input type="text" id="formLocation"></div>' +
+                    '<div><label>Status</label>' +
+                    '<select id="formStatus">' +
+                        '<option value="Pending">Pending</option>' +
+                        '<option value="In Progress">In Progress</option>' +
+                        '<option value="Resolved">Resolved</option>' +
+                    '</select></div>';
+            }
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        // Edit item
+        function editItem(type, id) {
+            showAddForm(type);
+            document.getElementById('itemId').value = id;
+            var title = 'Edit ' + type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('modalTitle').textContent = title;
+            
+            var url = '/api/' + type + 's/' + id;
+            fetch(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    document.getElementById('formTitle').value = data.title;
+                    document.getElementById('formDescription').value = data.description || data.content;
+                    
+                    if (type === 'event') {
+                        document.getElementById('formDate').value = data.date;
+                        document.getElementById('formLocation').value = data.location || '';
+                    } else if (type === 'service') {
+                        document.getElementById('formContact').value = data.contact || '';
+                        document.getElementById('formEmergency').checked = data.is_emergency || false;
+                    } else if (type === 'announcement') {
+                        document.getElementById('formDate').value = data.date;
+                        document.getElementById('formImportant').checked = data.is_important || false;
+                    } else if (type === 'complaint') {
+                        document.getElementById('formLocation').value = data.location || '';
+                        document.getElementById('formStatus').value = data.status || 'Pending';
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error loading item data');
+                });
+        }
+
+        // Delete item
+        function deleteItem(type, id) {
+            if (confirm('Delete this ' + type + '?')) {
+                var url = '/api/' + type + 's/' + id;
+                fetch(url, { method: 'DELETE' })
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (data.success) {
+                            location.reload();
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                        alert('Error deleting item');
+                    });
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Submit form
+        function submitForm(e) {
+            e.preventDefault();
+            
+            var type = document.getElementById('itemType').value;
+            var id = document.getElementById('itemId').value;
+            var title = document.getElementById('formTitle').value;
+            var description = document.getElementById('formDescription').value;
+            
+            var data = { title: title, description: description };
+            
+            if (type === 'event') {
+                data.date = document.getElementById('formDate').value;
+                data.location = document.getElementById('formLocation').value;
+            } else if (type === 'service') {
+                data.contact = document.getElementById('formContact').value;
+                data.is_emergency = document.getElementById('formEmergency').checked;
+            } else if (type === 'announcement') {
+                data.content = description;
+                data.date = document.getElementById('formDate').value;
+                data.is_important = document.getElementById('formImportant').checked;
+                delete data.description;
+            } else if (type === 'complaint') {
+                data.location = document.getElementById('formLocation').value;
+                data.status = document.getElementById('formStatus').value;
+            }
+            
+            var url = id ? '/api/' + type + 's/' + id : '/api/' + type + 's';
+            var method = id ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('Error saving item');
+            });
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            var modal = document.getElementById('modal');
+            var mediaModal = document.getElementById('mediaModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+            if (event.target === mediaModal) {
+                closeMediaModal();
+            }
+        };
+
+        // ===== EVENT MEDIA (photos / videos / documents) =====
+        var currentMediaEventId = null;
+
+        function openMediaModal(eventId, eventTitle) {
+            currentMediaEventId = eventId;
+            document.getElementById('mediaModalTitle').textContent = 'Media for: ' + eventTitle;
+            document.getElementById('mediaFileInput').value = '';
+            document.getElementById('mediaUploadStatus').textContent = '';
+            document.getElementById('mediaModal').classList.add('active');
+            loadEventMedia(eventId);
+        }
+
+        function closeMediaModal() {
+            document.getElementById('mediaModal').classList.remove('active');
+            currentMediaEventId = null;
+        }
+
+        function iconForMediaType(type) {
+            if (type === 'photo') return 'fa-image';
+            if (type === 'video') return 'fa-video';
+            return 'fa-file-alt';
+        }
+
+        function loadEventMedia(eventId) {
+            var list = document.getElementById('mediaList');
+            list.innerHTML = '<p style="color:#667;">Loading...</p>';
+            fetch('/api/events/' + eventId + '/media')
+                .then(function(response) { return response.json(); })
+                .then(function(items) {
+                    if (!items.length) {
+                        list.innerHTML = '<p style="color:#667;">No files uploaded yet.</p>';
+                        return;
+                    }
+                    list.innerHTML = '';
+                    items.forEach(function(item) {
+                        var cell = document.createElement('div');
+                        cell.style.cssText = 'text-align:center; border:1px solid #e2e8ed; border-radius:8px; padding:0.5rem; position:relative;';
+
+                        var preview = '';
+                        if (item.media_type === 'photo') {
+                            preview = '<img src="' + item.url + '" style="width:100%; height:70px; object-fit:cover; border-radius:6px;">';
+                        } else if (item.media_type === 'video') {
+                            preview = '<video src="' + item.url + '" style="width:100%; height:70px; object-fit:cover; border-radius:6px;" muted></video>';
+                        } else {
+                            preview = '<div style="height:70px; display:flex; align-items:center; justify-content:center;"><i class="fas ' + iconForMediaType(item.media_type) + '" style="font-size:1.8rem; color:#0b3b2c;"></i></div>';
+                        }
+
+                        cell.innerHTML =
+                            '<a href="' + item.url + '" target="_blank" rel="noopener">' + preview + '</a>' +
+                            '<div style="font-size:0.7rem; margin-top:0.25rem; word-break:break-word;">' + item.original_filename + '</div>' +
+                            '<a href="/media/' + item.id + '/download" style="display:inline-block; margin-top:0.25rem; font-size:0.75rem; color:#0b3b2c;"><i class="fas fa-download"></i> Download</a>' +
+                            '<button type="button" class="delete-btn" style="margin-top:0.25rem; width:100%;" onclick="deleteEventMediaItem(' + item.event_id + ', ' + item.id + ')">' +
+                            '<i class="fas fa-trash"></i></button>';
+                        list.appendChild(cell);
+                    });
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    list.innerHTML = '<p style="color:#c0392b;">Error loading media.</p>';
+                });
+        }
+
+        function uploadEventMedia() {
+            if (!currentMediaEventId) return;
+            var input = document.getElementById('mediaFileInput');
+            if (!input.files.length) {
+                alert('Choose at least one file first.');
+                return;
+            }
+
+            var formData = new FormData();
+            for (var i = 0; i < input.files.length; i++) {
+                formData.append('files', input.files[i]);
+            }
+
+            var status = document.getElementById('mediaUploadStatus');
+            status.textContent = 'Uploading...';
+
+            fetch('/api/events/' + currentMediaEventId + '/media', {
+                method: 'POST',
+                body: formData
+            })
+                .then(function(response) {
+                    if (!response.ok) {
+                        return response.json().then(function(err) { throw new Error(err.detail || 'Upload failed'); });
+                    }
+                    return response.json();
+                })
+                .then(function() {
+                    status.textContent = 'Uploaded!';
+                    input.value = '';
+                    loadEventMedia(currentMediaEventId);
+                    setTimeout(function() { status.textContent = ''; }, 2000);
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    status.textContent = '';
+                    alert('Error uploading file(s): ' + error.message);
+                });
+        }
+
+        function deleteEventMediaItem(eventId, mediaId) {
+            if (!confirm('Delete this file? This cannot be undone.')) return;
+            fetch('/api/events/' + eventId + '/media/' + mediaId, { method: 'DELETE' })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        loadEventMedia(eventId);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error deleting file');
+                });
+        }
+    </script>
+</body>
+</html>
